@@ -1,0 +1,288 @@
+{% load static %}<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Matt Morales, Elbert Moyon">
+    <meta name="generator" content="CCIS for Accre">
+    <title>CCIS</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'accreapp/css/b4.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'accreapp/css/dataTables.bootstrap4.css' %}" rel="stylesheet" type="text/css">
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="{% static 'accreapp/css/dashboard.css' %}" rel="stylesheet">
+    <link href="{% static 'accreapp/css/app.css' %}" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar navbar-dark sticky-top flex-md-nowrap p-0 shadow" style="background-color: #f7941e;">
+  <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">CCIS</a>
+  <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <ul class="navbar-nav px-3">
+    <li class="nav-item text-nowrap">
+      <a class="nav-link" href="{% url 'signout' %}">Sign out</a>
+    </li>
+  </ul>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+      <div class="sidebar-sticky pt-3">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link active" href="#">
+              <span data-feather="home"></span>
+              Dashboard <span class="sr-only">(current)</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file"></span>
+              Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="shopping-cart"></span>
+              Products
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="users"></span>
+              Customers
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="bar-chart-2"></span>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="layers"></span>
+              Integrations
+            </a>
+          </li>
+        </ul>
+
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Saved reports</span>
+          <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="nav flex-column mb-2">
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Current month
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Last quarter
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Social engagement
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <span data-feather="file-text"></span>
+              Year-end sale
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+      <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Files</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+          <div class="btn-group mr-2">
+            <button type="button" class="btn btn-sm btn-outline-primary" data-toggle="modal" data-target=".bulk-update" id="btnBulkUpdate" disabled> <span data-feather="tag"></span> Update/Tag</button>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target=".bulk-delete" id="btnBulkDelete" disabled> <span data-feather="trash-2"></span>Delete</button>
+          </div>
+          <div class="btn-group mr-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-toggle="modal" data-target="#modalUpload"> <span data-feather="upload"></span> Upload</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary"> <span data-feather="external-link"></span>Export</button>
+          </div>
+        </div>
+      </div>
+      
+      
+      <div class="table-responsive">
+        <table class="table" id="myTable" width="100%">
+          <thead>
+              <tr>
+                <th scope="col">Select</th>
+                <th scope="col">Filename</th>
+                <th scope="col">Date Created</th>
+                <th scope="col">Description</th>
+                <th scope="col">Tags</th>
+                <th scope="col">Uploaded at</th>
+                <th scope="col">ID</th>
+              </tr>
+            </thead>
+        </table>
+      </div>
+      <hr/>
+
+    </main>
+
+  </div>
+</div>
+
+ <!--MODAL Delete-->
+ <div class="modal bulk-delete" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Delete Files</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <div class="spinner-border text-primary" role="status" id="sPin1" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <small class="text-info"><i class="fas fa-info-circle"> </i> You'll be deleting <span id="docsDelete"></span> File(s)</small>
+        <form action="{% url 'bulk_delete' %}" method="POST" id="frmBulkdelete">
+          {% csrf_token %} 
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="id_verify_delete" name="id_verify_delete"/>
+            <label class="form-check-label" for="id_verify_delete">Proceed</label>
+          </div>
+          <button type="submit" class="btn btn-danger float-right"><i class="fas fa-trash-alt"> </i> Delete</button>
+        </form>
+      
+      </div>
+      <div class="modal-footer">
+        <span class="text-info" id="infoDel"></span><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODAL UPDATE-->
+<div class="modal bulk-update" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel1" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Update Files</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <div class="spinner-border text-primary" role="status" id="sPin" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <small class="text-info"><i class="fas fa-info-circle"> </i> You'll be updating <span id="docsUpdate"></span> File(s)</small>
+        <form action="{% url 'bulk_update' %}" method="POST" id="frmBulkUpdate">
+          {% csrf_token %} 
+          <div class="form-group">
+            <label for="custodian">Description</label>
+            <input type="text" class="form-control" id="description" name="description" aria-describedby="description" placeholder="Type Description">
+            <small id="description" class="form-text text-muted">Input description pertaining to the file.</small>
+          </div>
+          <div class="form-group">
+            <label for="physLoc">Date Created</label>
+            <input type="date" class="form-control" id="date_created" name="date_created" placeholder="Type physical location">
+          </div>
+          <div class="form-group">
+            <label for="physLoc">Tag/Classifiy</label>
+            <input type="text" class="form-control" id="tags" name="tags" placeholder="Type tag code">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="verifyMe" name="verifyMe"/>
+            <label class="form-check-label" for="verifyMe">Proceed</label>
+          </div>
+          <button type="submit" class="btn btn-primary float-right"><i class="fas fa-edit"> </i> Update</button>
+        </form>
+      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" role="dialog"  id="modalUpload" data-backdrop="static">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-body">
+            <h3 class="text-center">Upload Files</h3>
+            <div id="drop-area">
+              <form class="my-form" id="frmForm">
+               
+                <h5 class="text-center">Drag files here or <label class="button" for="fileElem" id="selectFile"><i class="fas fa-paperclip" ></i> Select Files</label></h5>
+                
+                <input type="file" id="fileElem" multiple accept=".png,.doc,.docx,.pdf" onchange="handleFiles(this.files)">
+                <p id="loadingStatus"></p>
+                <input type="hidden" data-csrf-token="{{ csrf_token }}" id="token"/>
+              </form>
+             
+              <ul id="filesToUpload" class="list-group">
+
+              </ul>
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <div class="container">
+              <div class=" row">
+                <div class="col-md-10" style="padding-left: 0px;padding-right: 40px;margin-top: 10px;">
+                   <progress id="progress-bar" max="100" value="0"></progress>
+                </div>
+                <div class="col-md-2">
+                      <div class="btn-group float-right" role="group" aria-label="Basic Buttons">
+                        <button type="button" class="btn btn-primary" id="bntUploadFiles">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+          </div>
+</div>
+<script type="text/javascript" src="{% static 'accreapp/js/jquery-3.5.1.slim.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'accreapp/js/b4.js' %}"></script>
+<script type="text/javascript" src="{% static 'accreapp/js/feather.js' %}"></script>
+<script type="text/javascript" src="{% static 'accreapp/js/datatables.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'accreapp/js/app.js' %}"></script>
+</html>

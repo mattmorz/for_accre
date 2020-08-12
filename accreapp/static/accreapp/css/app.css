@@ -1,0 +1,32 @@
+#drop-area {
+    border: 2px dashed #ccc;
+    border-radius:5px;
+    width: 100%;
+    padding: 20px
+  }
+#drop-area.highlight {
+    border-color: rgb(32, 43, 184);
+}
+
+#progress-bar { 
+    width: 100%;
+    display: none;
+}
+#fileElem {
+    display: none;
+}
+
+#selectFile{
+    padding: 3px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: beige;
+}
+
+#sPin,#sPin1{
+    position: absolute;
+    top: 50%;
+    display: none;
+    left: 45%;
+ }

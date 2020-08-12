@@ -1,0 +1,63 @@
+{% load static %}<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="Matt Morales, Elbert Moyon">
+    <meta name="generator" content="CCIS for Accre">
+    <title>CCIS</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'accreapp/css/b4.css' %}" rel="stylesheet">
+
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="{% static 'accreapp/css/floating_lables.css' %}" rel="stylesheet">
+  </head>
+  <body>
+  <form class="form-signin" id="frmLogin" method="POST" action="{% url 'landing' %}">
+    <div class="text-center mb-4">
+      <img class="mb-4" src="{% static 'accreapp/img/ccislogo2.png' %}" alt="" width="100" height="100">
+      <h1 class="h3 mb-3 font-weight-normal">CCIS</h1>
+      <p>for Accreditation</p>
+    </div>
+
+    <div class="form-label-group">
+      <input type="text" id="inputUsername" class="form-control" placeholder="Username" name="username" required autofocus>
+      <label for="inputUsername">Username</label>
+    </div>
+
+    <div class="form-label-group">
+      <input type="password" id="inputPassword" class="form-control" placeholder="Password" required name="password">
+      <label for="inputPassword">Password</label>
+    </div>
+  
+    {% csrf_token %}
+    <button class="btn btn-lg btn-primary btn-block" type="submit" id="btnSubmit">Sign in</button>
+    <div class="form-label-group">
+      <small class="text-danger" id="txtPrompt">{{ message }}</small>
+    </div>
+    <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
+</form>
+<script type="text/javascript" src="{% static 'accreapp/js/jquery-3.5.1.slim.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'accreapp/js/app.js' %}"></script>
+</body>
+
+</html>
