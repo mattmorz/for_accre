@@ -12,9 +12,9 @@ from taggit.models import TagBase, GenericTaggedItemBase,TaggedItemBase
 class Category(MPTTModel,TagBase):
   code = models.CharField(_("Code"), max_length=50, null=False, blank=False, default="")
   #alias = models.CharField(_("Alias"), max_length=50, default="")
-  description = models.CharField(_("Description"), max_length=50, default="")
+  description = models.TextField(_("Description"), default="")
   parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', db_index=True)
-  slug = models.SlugField(_("Slug"))
+  slug = models.SlugField(_("Slug"), blank=True, default="")
  
   class MPTTMeta:
     order_insertion_by = ['code']
@@ -39,9 +39,20 @@ class Category(MPTTModel,TagBase):
   def __str__(self):
     return self.code
 
+  def _get_unique_slug(self):
+      slug = slugify(self.code)
+      unique_slug = slug
+      num = 1
+      while Category.objects.filter(slug=unique_slug).exists():
+          unique_slug = '{}_{}'.format(slug, num)
+          num += 1
+      return unique_slug
+
   def save(self, *args, **kwargs):
-    self.slug = slugify(self.code)
-    super(Category, self).save(*args, **kwargs)
+      if not self.slug:
+          self.slug = self._get_unique_slug()
+      super().save(*args, **kwargs)
+
 
 class TaggedWhatever(GenericTaggedItemBase):
     # TaggedWhatever can also extend TaggedItemBase or a combination of
@@ -126,6 +137,9 @@ class Profile(models.Model):
         
     def display_office(self):
             return self.office
+    
+    def display_division(self):
+            return self.division
     
     def display_designation(self):
             return self.designation
