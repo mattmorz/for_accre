@@ -4,13 +4,14 @@ var STORED_IMG = [];
 var FORM_DATA_SCANNED = [];
 var SAVED_IMG = [];
 var controlNums = [];
+var SELECTED_FILES = [];
 feather.replace();
 
 var table2 = $('#myTable').DataTable({
     serverSide: true,
     processing: true,
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    order: [[ 2, "asc" ]],
+    order: [[ 6, "desc" ]],
     ajax: {
         url: '/getFiles',
         type: "GET"
@@ -44,7 +45,14 @@ var table2 = $('#myTable').DataTable({
         'render': function (data, type, row){
             var file_name = row.file_name;
             var lnk = "/media/"+file_name+"";
-            return  '<a href="'+lnk+'" target="_blank">'+file_name+"</>";
+            return  '<a href="'+lnk+'" title="'+file_name+'" target="_blank">'+file_name.substring(0,20)+"...</>";
+        }
+      },
+      {
+        'targets': 3,
+        'render': function (data, type, row){
+            var description = row.description;
+            return  description.substring(0,200)+"...";
         }
       },
       {
@@ -56,17 +64,23 @@ var table2 = $('#myTable').DataTable({
         }
       },
       {
-        'targets':[5,6],
+        'targets':[5],
         'searchable': false,
         'orderable': false,
         'visible':false,
-      }
+      },
+      {
+        'targets':6,
+        'searchable': false,
+        'orderable': true,
+        'visible':false,
+      },
     ],
     columns: [
         { "data": null},
         { "data": 'file_name'},
         { "data": 'date_created'},
-        { "data": 'description'},
+        { "data": 'description', "width": '50%'},
         { "data": 'tagged_items__tag__code'},
         { "data": 'uploaded_at'},
         { "data": 'id'},
@@ -200,44 +214,14 @@ function handleFiles(files) {
 }
 
 function previewFile(files) {
-    var ii = STORED_FILES.length + 1;
+  /*  
+  var ii = STORED_FILES.length + 1;
     var sorted = files.sort((a,b) => (a.order > b.order) ? 1 : ((b.order > a.order) ? -1 : 0)); 
     $.each(sorted, function(key,value){
         var idx = ii + value.order; 
         var listID = "File" + idx;
         var imgPath = value.filename;
-        var fileExt = imgPath.split('.').pop();
-
-        /**
-        var html ="<li id=\"" +listID+ "\" class='list-group-item d-flex justify-content-between align-items-center'>"+
-        "<span class='badge badge-primary badge-pill myPage'>"+parseInt(idx)+"</span>"+
-        "<img style=\"width:70px;height:auto;padding:5px;border: 1px solid #dee2e6;border-radius: .25rem;\" class=\"card-img-top\" src=\"/media/" +imgPath+ "\"  data-file='" + listID + "' class='img-fluid selFile card-img-top'>"+
-        "<span class='text-muted'>"+imgPath+"</span>"+
-        "<button class=\"btn btn-sm btn-danger float-right deleteU\"><i class=\"fas fa-trash-alt\"></i></button>"+
-        "</li>";
-        
-        if (fileExt === 'docx' || fileExt === 'doc'){
-            html ="<li id=\"" +listID+ "\" class='list-group-item d-flex justify-content-between align-items-center'>"+
-            "<span class='badge badge-primary badge-pill myPage'>"+parseInt(idx)+"</span>"+
-            "<i data-file='" + listID + "' class='fas fa-file-word text-primary selFile' style='font-size:xx-large;padding:5px;border: 1px solid #dee2e6;border-radius: .25rem;'></i>"+
-            "<span><a href=\"/media/"+imgPath+"\" target=\"_blank\">"+imgPath+"</a></span>"+
-            "<button class=\"btn btn-sm btn-danger float-right deleteU\"><i class=\"fas fa-trash-alt\"></i></button>"+
-            "</li>";
-        }
     
-        if (fileExt === 'pdf' || fileExt === 'PDF'){
-            html ="<li id=\"" +listID+ "\" class='list-group-item d-flex justify-content-between align-items-center'>"+
-            "<span class='badge badge-primary badge-pill myPage'>"+parseInt(idx)+"</span>"+
-            "<i data-file='" + listID + "' class='fas fa-file-pdf text-danger selFile' style='font-size:xx-large;padding:5px;border: 1px solid #dee2e6;border-radius: .25rem;'></i>"+
-            "<span><a href=\"/media/"+imgPath+"\" target=\"_blank\">"+imgPath+"</a></span>"+
-            "<button class=\"btn btn-sm btn-danger float-right deleteU\"><i class=\"fas fa-trash-alt\"></i></button>"+
-            "</li>";
-        }
-       
-        selDiv.append(html);
-         */
-       
-        
         //to keep track of the files
         FORM_DATA_SCANNED.push({
             'name': listID,
@@ -253,9 +237,10 @@ function previewFile(files) {
          });
         added = true; 
     })
+    */
     table2.ajax.reload();
     console.log('datatables reload');
-    console.log('Showing previewFIle now, index start ',+ii+', ends '+STORED_FILES.length);
+    //console.log('Showing previewFIle now, index start ',+ii+', ends '+STORED_FILES.length);
 }
 
 function uploadFile(file, i) {
@@ -345,6 +330,9 @@ $('#frmBulkdelete').submit(function(e){
               $('#sPin1').hide();
               table2.ajax.reload();
               controlNums = [];
+              SELECTED_FILES = [];
+              $('#docsDelete').html(controlNums.length);
+              $('#toBeDeletedFiles').html('');
           },
           error: function(e){
               $('#sPin1').hide();
@@ -363,13 +351,19 @@ $('#frmBulkdelete').submit(function(e){
 
 
 function updateMeF(that,controlNum){
+  var selected_file = $(that).closest('td').next().find('a').text();
+  //var description =  $(that).closest('td')
   if($(that).is(':checked')){
       controlNums.push(controlNum);
+      SELECTED_FILES.push(selected_file);
   }else{
       var idx = controlNums.indexOf(controlNum);
+      var idx1 = SELECTED_FILES.indexOf(selected_file);
       controlNums.splice(idx,1)
+      SELECTED_FILES.splice(idx1,1)
   }
   console.log('controlNums',controlNums);
+  console.log('SELECTED_FILES',SELECTED_FILES);
   $('#docsUpdate').html(controlNums.length);
   $('#docsDelete').html(controlNums.length);
  
@@ -381,4 +375,39 @@ function updateMeF(that,controlNum){
       $('#btnBulkDelete').attr("disabled", true);
   }
 
+  if(SELECTED_FILES.length ==1){
+    //$('#description').val();
+    //s$('#date_created').val();
+  }
+
 }
+
+$(document).ready(function(){
+
+  $('#btnBulkUpdate').click(function(){
+
+    var elm = '';
+    for(var i = 0; i < SELECTED_FILES.length; i++){
+      elm+='<span class="badge badge-info mr-1">'+SELECTED_FILES[i]+'</span>';
+    }
+    $('#toBeUpdatedFiles').html(elm);
+
+
+  })
+  $('#btnBulkDelete').click(function(){
+    var elm = '';
+    for(var i = 0; i < SELECTED_FILES.length; i++){
+      elm+='<span class="badge badge-info mr-1">'+SELECTED_FILES[i]+'</span>';
+    }
+    $('#toBeDeletedFiles').html(elm)
+
+  })
+
+  $('.js-data-example-ajax').select2({
+    placeholder: "Select Tag/s",
+    ajax: {
+      url: '/select2/fetch_items/accreapp/taggedwhatever/tag/',
+      dataType: 'json',
+    }
+  });
+})

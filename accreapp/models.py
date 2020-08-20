@@ -2,11 +2,16 @@ from django.db import models
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.db.models import Q
 from django.urls import reverse
 
 from mptt.models import MPTTModel, TreeForeignKey
 from taggit.managers import TaggableManager
 from taggit.models import TagBase, GenericTaggedItemBase,TaggedItemBase
+
+
+import select2.fields
+import select2.models
 
 # Create your models here.
 class Category(MPTTModel,TagBase):
@@ -37,8 +42,9 @@ class Category(MPTTModel,TagBase):
     return slugs
 
   def __str__(self):
+    #return self.code+' ('+self.description[:50]+')'
     return self.code
-
+    
   def _get_unique_slug(self):
       slug = slugify(self.code)
       unique_slug = slug
@@ -61,19 +67,40 @@ class TaggedWhatever(GenericTaggedItemBase):
     # example Food and Drink.
     # object = models.ForeignKey('File',verbose_name=_("File to Tag"),on_delete=models.CASCADE)
     # Here is where you provide your custom Tag class.
-    tag = models.ForeignKey(
+    tag = select2.fields.ForeignKey(
         Category,
         on_delete=models.CASCADE,
         related_name="%(app_label)s_%(class)s_items",
+        ajax=True,
+        search_field=lambda q: Q(code__icontains=q),# | Q(description__icontains=q),
+        overlay="Choose a code...",
+        js_options={
+            'quiet_millis': 200,
+        },
     )
 
     class Meta:
         verbose_name = _("Tagged File")
         verbose_name_plural = _("Tagged Files")
     
+class AccreDetails(models.Model):
+    level = models.CharField(_("Code"), max_length=3, null=False, blank=False, default="III")
+    course = models.CharField(_("Courses"), max_length=5, null=False, blank=False, default="BSIS")
+    accre_date =  models.DateField(_("Date of Accreditation"),null=True,blank=True)
+    def __str__(self):  
+        return str(self.course+'-'+self.level+'-'+str(self.accre_date))
+    
+    def __unicode__(self):
+        return unicode(self.course+'-'+self.level+'-'+str(self.accre_date))
+    
+    class Meta:
+        verbose_name = _("Accreditation Detail")
+        verbose_name_plural = _("Accreditation Detail")
+    
 
 class File(models.Model):
     user = models.ForeignKey(User, verbose_name=_("Uploaded by"),on_delete=models.CASCADE)
+    accre_details = models.ForeignKey(AccreDetails, verbose_name=_("Accreditation Details"),on_delete=models.CASCADE, default=1)
     file_name = models.FileField(_("Filename"))
     description =  models.TextField(_("Description"), max_length=10000, null=True, blank=True)
     order =  models.IntegerField(_("Order"),default=1)
