@@ -64,13 +64,7 @@ var table2 = $('#myTable').DataTable({
         }
       },
       {
-        'targets':[5],
-        'searchable': false,
-        'orderable': false,
-        'visible':false,
-      },
-      {
-        'targets':6,
+        'targets':[6,7],
         'searchable': false,
         'orderable': true,
         'visible':false,
@@ -80,8 +74,9 @@ var table2 = $('#myTable').DataTable({
         { "data": null},
         { "data": 'file_name'},
         { "data": 'date_created'},
-        { "data": 'description', "width": '50%'},
-        { "data": 'tagged_items__tag__code'},
+        { "data": 'description', "width": '40%'},
+        { "data": 'tagged_items__tag__code', "width": '20%'},
+        { "data": 'uploaded_by'},
         { "data": 'uploaded_at'},
         { "data": 'id'},
     ],
@@ -299,7 +294,7 @@ $('#frmBulkUpdate').submit(function(e){
             $('#sPin').show();
         },
         success : function(response) {
-            $('#sPin').hide();
+          $('#sPin').hide();
           console.log(response.is_updated);
           table2.ajax.reload();
         },
@@ -350,8 +345,44 @@ $('#frmBulkdelete').submit(function(e){
 })
 
 
+
+$('#frmRemoveTag').submit(function(e){
+  e.preventDefault();
+  if( $('#id_verify_delete1').is(':checked') && $('#tag') !== '')
+  {
+      $.ajax({
+          type : $(this).attr('method'),
+          data: $(this).serialize()+"&controlNums=" + JSON.stringify(controlNums),
+          dataType:'json',
+          url : $(this).attr('action'),
+          beforeSend: function(){
+              $('#sPin1').show(); 
+          },
+          success : function(response) {
+              $('#sPin1').hide();
+              table2.ajax.reload();
+              $('#toBeRemoveTags').html('');
+              $('#tag').html('')
+          },
+          error: function(e){
+              $('#sPin1').hide();
+              if(e.status === 404){
+                alert('You are not allowed to delete file.');
+              }
+             
+          }
+      });  
+
+  }else{
+      alert('Please verify by checking Proceed.')
+  }
+
+})
+
+
+
 function updateMeF(that,controlNum){
-  var selected_file = $(that).closest('td').next().find('a').text();
+  var selected_file = $(that).closest('td').next().find('a').attr('title');
   //var description =  $(that).closest('td')
   if($(that).is(':checked')){
       controlNums.push(controlNum);
@@ -383,7 +414,8 @@ function updateMeF(that,controlNum){
 }
 
 $(document).ready(function(){
-
+  $('#btnBulkUpdate').attr("disabled", true);
+  $('#btnBulkDelete').attr("disabled", true);
   $('#btnBulkUpdate').click(function(){
 
     var elm = '';
@@ -404,10 +436,21 @@ $(document).ready(function(){
   })
 
   $('.js-data-example-ajax').select2({
-    placeholder: "Select Tag/s",
+    placeholder: "Type Code or Area description",
     ajax: {
       url: '/select2/fetch_items/accreapp/taggedwhatever/tag/',
       dataType: 'json',
     }
   });
+
+})
+
+$(document).on('click', '.tagtag', function () {
+  event.stopImmediatePropagation();
+  $('#tag').val($(this).text());
+  
+  var file = $(this).closest('td').prevUntil('a').find('a').attr('title');
+  $('#file_name').val(file);
+  $('#toBeRemoveTags').html('Remove tag <span class="badge badge-success mr-1">'+$(this).text()+'</span> on <strong>'+file+'</strong>?')
+
 })

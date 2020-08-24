@@ -42,8 +42,8 @@ class Category(MPTTModel,TagBase):
     return slugs
 
   def __str__(self):
-    #return self.code+' ('+self.description[:50]+')'
-    return self.code
+    return self.code+' ('+self.description[:50]+')'
+    #return self.code
     
   def _get_unique_slug(self):
       slug = slugify(self.code)
@@ -72,7 +72,7 @@ class TaggedWhatever(GenericTaggedItemBase):
         on_delete=models.CASCADE,
         related_name="%(app_label)s_%(class)s_items",
         ajax=True,
-        search_field=lambda q: Q(code__icontains=q),# | Q(description__icontains=q),
+        search_field=lambda q: Q(code__icontains=q)| Q(description__icontains=q),
         overlay="Choose a code...",
         js_options={
             'quiet_millis': 200,
@@ -107,6 +107,7 @@ class File(models.Model):
     date_created = models.DateField(_("Date Created"),null=True,blank=True)
     extracted_text =  models.TextField(_("Extracted Texts"), max_length=10000, null=True, blank=True)
     uploaded_at = models.DateTimeField(_("Upload Date"), auto_now=False, auto_now_add=True)
+    flag = models.BooleanField(default=0)
     tags = TaggableManager(through=TaggedWhatever,blank=True)
     
     class Meta:
@@ -125,8 +126,10 @@ class File(models.Model):
     def get_tags(self):
         tags = []
         for tag in self.tags.all():
-          tags.append(str(tag))
-        return ', '.join(tags)
+            str_tag = str(tag)
+            split_tag = str_tag.split('(')    
+            tags.append('<span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span>')
+        return ' '.join(tags)
     
 
 class Log(models.Model):
