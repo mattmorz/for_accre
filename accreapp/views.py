@@ -106,7 +106,8 @@ def mainTableData(request):
         if search_value:
             allfiles = allfiles.filter(Q(file_name__icontains=search_value) |
                                     Q(tags__code__icontains=search_value) |
-                                    Q(description__icontains=search_value)).all().distinct()
+                                    Q(user__username__icontains=search_value) |
+                                    Q(description__icontains=search_value)).all().exclude(flag=1).distinct()
         count = allfiles.count()
         if length != -1:
             allfiles = allfiles.order_by(order_column)[start:start + length]
