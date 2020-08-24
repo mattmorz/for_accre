@@ -174,6 +174,41 @@
   </div>
 </div>
 
+ <!--MODAL remove tag-->
+ <div class="modal remove-tag " tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel11" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel11">Confirm Remove Tag</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" >
+        <div class="spinner-border text-primary" role="status" id="sPin1" style="width: 3rem; height: 3rem;">
+          <span class="sr-only">Loading...</span>
+        </div>
+        <div id="toBeRemoveTags"></div>
+        <form action="{% url 'remove_tag' %}" method="POST" id="frmRemoveTag">
+          {% csrf_token %} 
+          <input type="hidden" class="form-check-input" id="tag" name="tag"/>
+          <input type="hidden" class="form-check-input" id="file_name" name="file_name"/>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="id_verify_delete1" name="id_verify_delete1"/>
+            <label class="form-check-label" for="id_verify_delete1">Proceed</label>
+          </div>
+          <button type="submit" class="btn btn-danger float-right"><i class="fas fa-trash-alt"> </i> Remove Tag</button>
+        </form>
+      
+      </div>
+      <div class="modal-footer">
+        <span class="text-info" id="infoDel"></span><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <!--MODAL UPDATE-->
 <div class="modal bulk-update" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel1" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -212,8 +247,21 @@
             <input type="checkbox" class="form-check-input" id="verifyMe" name="verifyMe"/>
             <label class="form-check-label" for="verifyMe">Proceed</label>
           </div>
-          <span class="badge badge-info">Note: Only the uploader can update the description and document date.</span>
-          <button type="submit" class="btn btn-primary float-right"><i class="fas fa-edit"> </i> Update</button>
+          <div class="row">
+            <div class="col-md-10">
+              <div class="alert alert-warning alert-dismissible fade show" role="alert" style="line-height: 12pt;">
+                <strong>Note:</strong>  ONLY the uploaders can update the description and document date. However, you can tag their files.
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-2">
+            <button type="submit" class="btn btn-primary float-right"><i class="fas fa-edit"> </i> Update</button>
+            </div>
+          </div>
+   
+         
         </form>
       
       </div>

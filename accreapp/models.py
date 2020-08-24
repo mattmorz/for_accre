@@ -128,7 +128,7 @@ class File(models.Model):
         for tag in self.tags.all():
             str_tag = str(tag)
             split_tag = str_tag.split('(')    
-            tags.append('<span class="badge badge-success">'+split_tag[0]+'</span>')
+            tags.append('<span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span>')
         return ' '.join(tags)
     
 

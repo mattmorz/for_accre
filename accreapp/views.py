@@ -167,12 +167,16 @@ def bulkUpdate(request):
                 codes = []
                 for j in tags:
                     if len(tags) > 0 and tags[0] != '':
-                        if Category.objects.filter(id=j).exists():
-                            tagss =  Category.objects.get(id = j)
+                        tagss =  Category.objects.get(id = j)
+                        if Category.objects.filter(id=j).exists() and b.user.id == current_user.id:
                             TaggedWhatever.objects.filter(object_id=i).delete()
                             bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss))
                             TaggedWhatever.objects.bulk_create(bulk_taggedFile)
                             codes.append(tagss.code)      
+                        elif Category.objects.filter(id=j).exists():
+                            bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss))
+                            TaggedWhatever.objects.bulk_create(bulk_taggedFile)
+                            codes.append(tagss.code) 
                         else:
                             print ('invalid tag')
                 if len(tags) > 0 and tags[0] != '':
@@ -213,5 +217,23 @@ def bulkDelete(request):
             return JsonResponse({'is_deleted_items': is_deleted})
         else:
             return JsonResponse({'is_deleted_items': 0})
+    else:
+        raise Http404
+
+
+def removeTag(request):
+    current_user = request.user
+    user_instance = User.objects.get(id=current_user.id)
+    content_type = ContentType.objects.get(id=13)
+
+    if request.user.is_authenticated:
+        tag = request.POST.get('tag')
+        file = request.POST.get('file_name')
+        b = File.objects.get(file_name=file)
+        print (tag)
+        TaggedWhatever.objects.filter(tag__code=tag).delete()
+        action.send(user_instance, verb='Removed tag',action_object=b,description='Removed tag  '+tag+' on '+str(b.file_name) , target=content_type)
+
+        return JsonResponse({'is_deleted_items': 1})
     else:
         raise Http404
