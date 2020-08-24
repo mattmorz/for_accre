@@ -64,13 +64,7 @@ var table2 = $('#myTable').DataTable({
         }
       },
       {
-        'targets':[5],
-        'searchable': false,
-        'orderable': false,
-        'visible':false,
-      },
-      {
-        'targets':6,
+        'targets':[6,7],
         'searchable': false,
         'orderable': true,
         'visible':false,
@@ -82,6 +76,7 @@ var table2 = $('#myTable').DataTable({
         { "data": 'date_created'},
         { "data": 'description', "width": '50%'},
         { "data": 'tagged_items__tag__code'},
+        { "data": 'uploaded_by'},
         { "data": 'uploaded_at'},
         { "data": 'id'},
     ],
@@ -299,7 +294,7 @@ $('#frmBulkUpdate').submit(function(e){
             $('#sPin').show();
         },
         success : function(response) {
-            $('#sPin').hide();
+          $('#sPin').hide();
           console.log(response.is_updated);
           table2.ajax.reload();
         },
@@ -351,7 +346,7 @@ $('#frmBulkdelete').submit(function(e){
 
 
 function updateMeF(that,controlNum){
-  var selected_file = $(that).closest('td').next().find('a').text();
+  var selected_file = $(that).closest('td').next().find('a').attr('title');
   //var description =  $(that).closest('td')
   if($(that).is(':checked')){
       controlNums.push(controlNum);
@@ -383,7 +378,8 @@ function updateMeF(that,controlNum){
 }
 
 $(document).ready(function(){
-
+  $('#btnBulkUpdate').attr("disabled", true);
+  $('#btnBulkDelete').attr("disabled", true);
   $('#btnBulkUpdate').click(function(){
 
     var elm = '';

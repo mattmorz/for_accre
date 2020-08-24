@@ -76,6 +76,7 @@ ORDER_COLUMN_CHOICES =Choices(
     ('4', 'tagged_items__tag__code'),
     ('5', 'uploaded_at'),
     ('6', 'id'),
+    ('7', 'uploaded_by')
 )
 
 def mainTableData(request):
@@ -97,9 +98,9 @@ def mainTableData(request):
         prof = Profile.objects.get(pk= user.id)
         prof_department =  prof.department
 
-        allfiles = File.objects.all().distinct()
-        if request.user.is_staff and not request.user.is_superuser:
-            allfiles = File.objects.filter(user__profile__department = prof_department).all().distinct()
+        allfiles = File.objects.all().exclude(flag=1).distinct()
+        #if request.user.is_staff and not request.user.is_superuser:
+        #    allfiles = File.objects.filter(user__profile__department = prof_department).all().distinct()
         total = allfiles.count()
         
         if search_value:
@@ -123,6 +124,7 @@ def mainTableData(request):
                 'tagged_items__tag__code': i.get_tags(),
                 'date_created': dd,
                 'description': i.description,
+                'uploaded_by': i.user.username,
                 'uploaded_at': i.uploaded_at
             })
 
@@ -149,7 +151,8 @@ def bulkUpdate(request):
         is_updated = 1
         d = {}
         content_type = ContentType.objects.get(id=9)
-        
+        your_ids = []
+
         if len(controlNums) > 0 :
             if not description == '':
                 d['description'] = description
@@ -158,6 +161,8 @@ def bulkUpdate(request):
             bulk_taggedFile = []
             for i in controlNums:
                 b = File.objects.get(id=i)
+                if b.user.id == current_user.id:
+                    your_ids.append(i)
                 codes = []
                 for j in tags:
                     if len(tags) > 0 and tags[0] != '':
@@ -178,7 +183,8 @@ def bulkUpdate(request):
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description.' , target=content_type)
                 elif not date_created == '':     
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s date.' , target=content_type)
-            File.objects.filter(id__in=controlNums).update(**d)
+            print (your_ids)
+            File.objects.filter(id__in=your_ids).update(**d)
            
         return JsonResponse({'is_updated': is_updated})
     else:
@@ -202,7 +208,7 @@ def bulkDelete(request):
                 action.send(user_instance, verb='Deleted',action_object=b,description='Deleted File  '+str(b.file_name) , target=content_type)
             if counter == len(controlNums):
                 print ('wwwww')
-                File.objects.filter(id__in=controlNums).delete()
+                File.objects.filter(id__in=controlNums).update(flag=1)
             return JsonResponse({'is_deleted_items': is_deleted})
         else:
             return JsonResponse({'is_deleted_items': 0})
