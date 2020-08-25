@@ -447,23 +447,11 @@ $(document).ready(function(){
 })
 
 
-$('ul.dropdown-menu [data-toggle=dropdown]').on('click', function (event) {
-  // Avoid following the href location when clicking
-  event.preventDefault();
-  // Avoid having the menu to close when clicking
-  event.stopPropagation();
-  // If a menu is already open we close it
-  $('ul.dropdown-menu [data-toggle=dropdown]').parent().removeClass('open');
-  // opening the one you clicked on
-  $(this).parent().addClass('open');
-});
-
 })
 
 $(document).on('click', '.tagtag', function () {
   event.stopImmediatePropagation();
   $('#tag').val($(this).text());
-  
   var file = $(this).closest('td').prevUntil('a').find('a').attr('title');
   $('#file_name').val(file);
   $('#toBeRemoveTags').html('Remove tag <span class="badge badge-success mr-1">'+$(this).text()+'</span>on <strong>'+file+'</strong>?')
