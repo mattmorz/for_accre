@@ -10,6 +10,7 @@ feather.replace();
 var table2 = $('#myTable').DataTable({
     serverSide: true,
     processing: true,
+    //dom: 'trip',
     lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
     order: [[ 6, "desc" ]],
     ajax: {
@@ -28,12 +29,10 @@ var table2 = $('#myTable').DataTable({
               var file_id = "'"+row.id+"'";
               var id = "" + row.id; 
               if(controlNums.indexOf(id) != -1){
-                console.log('in the array');
               return  '<div class="form-check">'+
                       '<input type="checkbox" class="form-check-input updateMe" onclick="updateMeF(this,'+file_id+');" name="checkboxname" checked> '+
                       '</div>';
               }else{
-                console.log('not in the array');
                 return  '<div class="form-check">'+
                         '<input type="checkbox" class="form-check-input updateMe" onclick="updateMeF(this,'+file_id+');" name="checkboxname">'+
                         '</div>';
@@ -443,6 +442,22 @@ $(document).ready(function(){
     }
   });
 
+  $('#myInputTextField').keyup(function(){
+    table2.search($(this).val()).draw() ;
+})
+
+
+$('ul.dropdown-menu [data-toggle=dropdown]').on('click', function (event) {
+  // Avoid following the href location when clicking
+  event.preventDefault();
+  // Avoid having the menu to close when clicking
+  event.stopPropagation();
+  // If a menu is already open we close it
+  $('ul.dropdown-menu [data-toggle=dropdown]').parent().removeClass('open');
+  // opening the one you clicked on
+  $(this).parent().addClass('open');
+});
+
 })
 
 $(document).on('click', '.tagtag', function () {
@@ -451,6 +466,6 @@ $(document).on('click', '.tagtag', function () {
   
   var file = $(this).closest('td').prevUntil('a').find('a').attr('title');
   $('#file_name').val(file);
-  $('#toBeRemoveTags').html('Remove tag <span class="badge badge-success mr-1">'+$(this).text()+'</span> on <strong>'+file+'</strong>?')
+  $('#toBeRemoveTags').html('Remove tag <span class="badge badge-success mr-1">'+$(this).text()+'</span>on <strong>'+file+'</strong>?')
 
 })

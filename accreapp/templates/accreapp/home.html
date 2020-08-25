@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load static %}{% load mptt_tags %}<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -39,7 +39,7 @@
   <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+  <input class="form-control form-control w-100" type="text" placeholder="Search by typing filename, description or tag..." aria-label="Search" id="myInputTextField">
   <ul class="navbar-nav px-3">
     <li class="nav-item text-nowrap">
       <a class="nav-link" href="{% url 'signout' %}">Sign out</a>
@@ -49,7 +49,7 @@
 
 <div class="container-fluid">
   <div class="row">
-    <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-light sidebar collapse">
+    <nav id="sidebarMenu" class="col-md-3 col-lg-3 d-md-block bg-light sidebar collapse">
       <div class="sidebar-sticky pt-3">
         <ul class="nav flex-column">
           <li class="nav-item">
@@ -65,7 +65,39 @@
             </a>
           </li> 
         </ul>
+        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+          <span>Area</span>
+          <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+            <span data-feather="plus-circle"></span>
+          </a>
+        </h6>
+        <ul class="root">
+          {% recursetree nodes %}
+              <li class="nav-item">
+                  {% if node.level == 0 %}
+                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand">{{ node.name }} {{ node.description }}</a>
+                  {% elif node.level == 1 %}
+                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand">{{ node.name }} {{ node.description }}</a>  <small>({{ node.count }} items)</small>
+                  {% else %}
+                    {% if node.count == 0 %}
+                      <a href="?q={{ node.slug }}" title="{{ node.description }}" data-toggle="collapse">{{ node.name }}  </a>
+                    {% else %}
+                      <a href="#collapse{{ node.pk }}" title="{{ node.description }}" data-toggle="collapse">{{ node.name }}  </a> <small>({{ node.count }} items)</small>
+                    {% endif %}
+                  {% endif %}
+
+                  {% if not node.is_leaf_node %}
+                      <ul class="children collapse" id="collapse{{ node.pk }}">
+                          {{ children }}
+                      </ul>
+                  {% endif %}
+
+              </li>
+          {% endrecursetree %}
+        </ul>
+       
         <!--
+         
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
           <span>Saved reports</span>
           <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
@@ -102,7 +134,7 @@
       -->
     </nav>
 
-    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+    <main role="main" class="col-md-9 ml-sm-auto col-lg-9 px-md-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Files</h1>
         <div class="btn-toolbar mb-2 mb-md-0">
@@ -241,7 +273,7 @@
             <label for="tags">Tag/Classifiy</label>
             <!--<input type="text" class="form-control" placeholder="Type tag code">-->
             <select class="js-data-example-ajax form-control"  id="tags" name="tags" form-control  multiple="multiple" style="width: 100%"></select>
-            <small id="description" class="form-text text-muted">Select all applicable tags. Note: Previous tags will be overwritten.</small>
+            <small id="description" class="form-text text-muted">Select all applicable tags. Note: You can delete tag by clicking it on the table.</small>
           </div>
           <div class="form-check">
             <input type="checkbox" class="form-check-input" id="verifyMe" name="verifyMe"/>
