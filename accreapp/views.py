@@ -229,7 +229,6 @@ def removeTag(request):
         tag = request.POST.get('tag')
         file = request.POST.get('file_name')
         b = File.objects.get(file_name=file)
-        print (tag)
         TaggedWhatever.objects.filter(tag__code=tag,object_id=b.id).delete()
         action.send(user_instance, verb='Removed tag',action_object=b,description='Removed tag  '+tag+' on '+str(b.file_name) , target=content_type)
 
