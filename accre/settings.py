@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middlewares.middlewares.RequestMiddleware',
 ]
 
 ROOT_URLCONF = 'accre.urls'
@@ -61,7 +62,7 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
-            os.path.join('templates'),
+            #os.path.join('templates'),
             ],
         'APP_DIRS': True,
         'OPTIONS': {

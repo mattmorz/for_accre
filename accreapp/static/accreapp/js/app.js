@@ -444,8 +444,14 @@ $(document).ready(function(){
 
   $('#myInputTextField').keyup(function(){
     table2.search($(this).val()).draw() ;
+  })
+
+
 })
 
+$(document).on('click', '.forFilter', function () {
+  var tag = $(this).attr('data-tag');
+  table2.search(tag.trim()).draw() ;
 
 })
 

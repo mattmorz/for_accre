@@ -13,6 +13,8 @@ from taggit.models import TagBase, GenericTaggedItemBase,TaggedItemBase
 import select2.fields
 import select2.models
 
+from middlewares.middlewares import RequestMiddleware
+
 # Create your models here.
 class Category(MPTTModel,TagBase):
   code = models.CharField(_("Code"), max_length=50, null=False, blank=False, default="")
@@ -124,11 +126,17 @@ class File(models.Model):
         return self.file_name.url
     
     def get_tags(self):
+        request = RequestMiddleware(get_response=None)
+        request = request.thread_local.current_request
         tags = []
         for tag in self.tags.all():
             str_tag = str(tag)
-            split_tag = str_tag.split('(')    
-            tags.append('<h6><span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span></h6>')
+            split_tag = str_tag.split('(')
+            print (request.user.is_superuser)
+            if request.user.is_superuser or request.user.is_staff:
+                tags.append('<h6><span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span></h6>')
+            else:
+                tags.append('<h6><span class="badge badge-success" title="'+tag.description+'">'+split_tag[0]+'</span></h6>')
         return ' '.join(tags)
     
 
