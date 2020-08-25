@@ -69,14 +69,14 @@
           {% recursetree nodes %}
               <li class="nav-item">
                   {% if node.level == 0 %}
-                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand">{{ node.name }} {{ node.description }}</a>
+                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand" class="forFilter" data-tag="{{ node.name }}">{{ node.name }} {{ node.description }}</a>
                   {% elif node.level == 1 %}
-                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand">{{ node.name }} {{ node.description }}</a>  <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
+                    <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand" class="forFilter" data-tag="{{ node.name }}">{{ node.name }} {{ node.description }}</a>  <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
                   {% else %}
                     {% if node.is_leaf_node %}
-                      <a href="?q={{ node.slug }}" title="{{ node.description }}" data-toggle="collapse">{{ node.name }}  </a>
+                      <a href="?q={{ node.slug }}" title="{{ node.description }}" data-toggle="collapse" class="forFilter" data-tag="{{ node.name }}">{{ node.name }}  </a>
                     {% else %}
-                      <a href="#collapse{{ node.pk }}" title="{{ node.description }}" data-toggle="collapse">{{ node.name }}  </a> <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
+                      <a href="#collapse{{ node.pk }}" title="{{ node.description }}" data-toggle="collapse" class="forFilter" data-tag="{{ node.name }}">{{ node.name }}  </a> <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
                     {% endif %}
                   {% endif %}
 
@@ -89,43 +89,6 @@
               </li>
           {% endrecursetree %}
         </ul>
-       
-        <!--
-         
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-          <span>Saved reports</span>
-          <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
-            <span data-feather="plus-circle"></span>
-          </a>
-        </h6>
-        <ul class="nav flex-column mb-2">
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Current month
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Last quarter
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Social engagement
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">
-              <span data-feather="file-text"></span>
-              Year-end sale
-            </a>
-          </li>
-        </ul>
-      </div
-      -->
     </nav>
 
     <main role="main" class="col-md-9 ml-sm-auto col-lg-9 px-md-4">
