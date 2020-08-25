@@ -61,7 +61,7 @@
         </ul>
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
           <span>Area</span>
-          <a class="d-flex align-items-center text-muted" href="#" aria-label="Add a new report">
+          <a class="d-flex align-items-center text-muted" href="#" aria-label="Area">
             <span data-feather="plus-circle"></span>
           </a>
         </h6>
@@ -94,6 +94,7 @@
     <main role="main" class="col-md-9 ml-sm-auto col-lg-9 px-md-4">
       <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Files</h1>
+        {% if request.user.is_staff or request.user.is_superuser %}
         <div class="btn-toolbar mb-2 mb-md-0">
           <div class="btn-group mr-2">
             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bulk-update" id="btnBulkUpdate" disabled> <span data-feather="tag"></span> Update/Tag</button>
@@ -104,6 +105,7 @@
             <button type="button" class="btn btn-sm btn-secondary"> <span data-feather="external-link"></span>Export</button>
           </div>
         </div>
+        {% endif %}
       </div>
       
       
@@ -130,6 +132,7 @@
   </div>
 </div>
 
+{% if request.user.is_staff or request.user.is_superuser %}
  <!--MODAL Delete-->
  <div class="modal bulk-delete" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel1" aria-hidden="true">
   <div class="modal-dialog" role="document">
@@ -260,7 +263,7 @@
     </div>
   </div>
 </div>
-
+{% endif %}
 <div class="modal fade" role="dialog"  id="modalUpload" data-backdrop="static">
   <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
@@ -302,6 +305,7 @@
         </div>
           </div>
 </div>
+
 <script type="text/javascript" src="{% static 'accreapp/js/jquery-3.5.1.slim.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'accreapp/js/b4.js' %}"></script>
 <script type="text/javascript" src="{% static 'accreapp/js/feather.js' %}"></script>

@@ -87,8 +87,8 @@ def mainTableData(request):
         start = int(request.GET.get('start', None))
         search_value = request.GET.get('search[value]',None)
 
-        if not (request.user.is_superuser or request.user.is_staff):
-            search_value = request.user.username
+        #if not (request.user.is_superuser or request.user.is_staff):
+        #    search_value = request.user.username
         order_column = request.GET.get('order[0][column]', None)
         order =  request.GET.get('order[0][dir]', None)
         order_column = ORDER_COLUMN_CHOICES[order_column]

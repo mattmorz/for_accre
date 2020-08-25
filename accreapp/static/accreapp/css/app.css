@@ -41,9 +41,9 @@
  }
  .tagtag:hover:before{
     content: "REMOVE ";
-    color: red;
+    color: black;
  }
 .root{
     list-style-type: none;
-    padding-left: 20px;
+    padding-left: 25px;
 }
