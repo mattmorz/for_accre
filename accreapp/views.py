@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count
 
 from accreapp.models import TaggedWhatever, Profile, File, Category
 from taggit.models import Tag
@@ -25,8 +26,8 @@ from model_utils import Choices
 def home(request):
     current_user = request.user
     user_instance = User.objects.get(id=current_user.id)
-    #print (user_instance.get_group_permissions())
-    return render(request, 'accreapp/home.html')
+    nodes = Category.objects.all().annotate(count=Count('children')).order_by('tree_id')
+    return render(request, 'accreapp/home.html', {'nodes': nodes })
 
 def index(request):
     username = request.POST.get('username',False)
@@ -148,7 +149,7 @@ def bulkUpdate(request):
         description = request.POST.get('description')
         date_created = request.POST.get('date_created')
         tags =  request.POST.getlist('tags')
-        print (tags)
+        #print (tags)
         is_updated = 1
         d = {}
         content_type = ContentType.objects.get(id=9)
@@ -169,7 +170,7 @@ def bulkUpdate(request):
                     if len(tags) > 0 and tags[0] != '':
                         tagss =  Category.objects.get(id = j)
                         if Category.objects.filter(id=j).exists() and b.user.id == current_user.id:
-                            TaggedWhatever.objects.filter(object_id=i).delete()
+                            #TaggedWhatever.objects.filter(object_id=i).delete()
                             bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss))
                             TaggedWhatever.objects.bulk_create(bulk_taggedFile)
                             codes.append(tagss.code)      
@@ -184,7 +185,7 @@ def bulkUpdate(request):
                 if not description == '' and not date_created == '':   
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description and date.' , target=content_type)
                 elif not description == '':    
-                    print('i am here')    
+                    #print('i am here')    
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description.' , target=content_type)
                 elif not date_created == '':     
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s date.' , target=content_type)

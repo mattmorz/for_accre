@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'taggit',
     'select2',
     'actstream',
+    'mptt',
 ]
 
 MIDDLEWARE = [
