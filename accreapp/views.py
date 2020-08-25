@@ -140,7 +140,6 @@ def mainTableData(request):
     else:
         raise Http404
 
-
 def bulkUpdate(request):
     if request.user.is_authenticated and request.method == 'POST':
         current_user = request.user
@@ -221,7 +220,6 @@ def bulkDelete(request):
     else:
         raise Http404
 
-
 def removeTag(request):
     current_user = request.user
     user_instance = User.objects.get(id=current_user.id)
@@ -232,7 +230,7 @@ def removeTag(request):
         file = request.POST.get('file_name')
         b = File.objects.get(file_name=file)
         print (tag)
-        TaggedWhatever.objects.filter(tag__code=tag).delete()
+        TaggedWhatever.objects.filter(tag__code=tag,object_id=b.id).delete()
         action.send(user_instance, verb='Removed tag',action_object=b,description='Removed tag  '+tag+' on '+str(b.file_name) , target=content_type)
 
         return JsonResponse({'is_deleted_items': 1})

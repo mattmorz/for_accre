@@ -72,7 +72,7 @@ class TaggedWhatever(GenericTaggedItemBase):
         on_delete=models.CASCADE,
         related_name="%(app_label)s_%(class)s_items",
         ajax=True,
-        search_field=lambda q: Q(code__icontains=q)| Q(description__icontains=q),
+        search_field=lambda q: Q(code__istartswith=q)| Q(description__icontains=q),
         overlay="Choose a code...",
         js_options={
             'quiet_millis': 200,
@@ -128,7 +128,7 @@ class File(models.Model):
         for tag in self.tags.all():
             str_tag = str(tag)
             split_tag = str_tag.split('(')    
-            tags.append('<span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span>')
+            tags.append('<h6><span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span></h6>')
         return ' '.join(tags)
     
 
