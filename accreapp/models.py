@@ -136,7 +136,7 @@ class File(models.Model):
             if request.user.is_superuser or request.user.is_staff:
                 tags.append('<h6><span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span></h6>')
             else:
-                tags.append('<h6><span class="badge badge-success">'+split_tag[0]+'</span></h6>')
+                tags.append('<h6><span class="badge badge-success" title="'+tag.description+'">'+split_tag[0]+'</span></h6>')
         return ' '.join(tags)
     
 
