@@ -69,6 +69,7 @@ class TaggedWhatever(GenericTaggedItemBase):
     # example Food and Drink.
     # object = models.ForeignKey('File',verbose_name=_("File to Tag"),on_delete=models.CASCADE)
     # Here is where you provide your custom Tag class.
+    user = models.ForeignKey(User, verbose_name=_("Tagged by"),on_delete=models.CASCADE)
     tag = select2.fields.ForeignKey(
         Category,
         on_delete=models.CASCADE,
@@ -132,7 +133,6 @@ class File(models.Model):
         for tag in self.tags.all():
             str_tag = str(tag)
             split_tag = str_tag.split('(')
-            print (request.user.is_superuser)
             if request.user.is_superuser or request.user.is_staff:
                 tags.append('<h6><span class="badge badge-success tagtag" data-toggle="modal" data-target=".remove-tag" title="Click to remove this tag" >'+split_tag[0]+'</span></h6>')
             else:

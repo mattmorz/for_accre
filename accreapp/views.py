@@ -30,7 +30,8 @@ def home(request):
     current_user = request.user
     user_instance = User.objects.get(id=current_user.id)
     nodes = Category.objects.all().annotate(count=Count('children')).order_by('tree_id')
-    return render(request, 'accreapp/home.html', {'nodes': nodes })
+    isAllowed = current_user.is_superuser | current_user.is_staff
+    return render(request, 'accreapp/home.html', {'nodes': nodes, 'isAllowed':isAllowed})
 
 def index(request):
     username = request.POST.get('username',False)
@@ -152,49 +153,65 @@ def bulkUpdate(request):
         date_created = request.POST.get('date_created')
         tags =  request.POST.getlist('tags')
         #print (tags)
-        is_updated = 1
+
         d = {}
         content_type = ContentType.objects.get(id=9)
         your_ids = []
 
         if len(controlNums) > 0 :
+            if len(tags) == 0 and description == '' and date_created == '':
+                return JsonResponse({'is_updated': 2})
+
             if not description == '':
                 d['description'] = description
             if not date_created == '':
                 d['date_created'] = date_created
+            
             bulk_taggedFile = []
             for i in controlNums:
                 b = File.objects.get(id=i)
                 if b.user.id == current_user.id:
                     your_ids.append(i)
                 codes = []
+               
+                print ('tags',tags)
                 for j in tags:
                     if len(tags) > 0 and tags[0] != '':
                         tagss =  Category.objects.get(id = j)
+                        '''
                         if Category.objects.filter(id=j).exists() and b.user.id == current_user.id:
                             #TaggedWhatever.objects.filter(object_id=i).delete()
-                            bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss))
+                            bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss, user = user_instance))
                             TaggedWhatever.objects.bulk_create(bulk_taggedFile)
                             codes.append(tagss.code)      
-                        elif Category.objects.filter(id=j).exists():
-                            bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss))
-                            TaggedWhatever.objects.bulk_create(bulk_taggedFile)
+                        '''
+                        if Category.objects.filter(id=j).exists() and not TaggedWhatever.objects.filter(object_id=i,tag = tagss).exists():
+                            bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss, user = user_instance))
+                            #print (bulk_taggedFile)
                             codes.append(tagss.code) 
                         else:
-                            print ('invalid tag')
+                            print ('duplicated/invalid tag')
+
                 if len(tags) > 0 and tags[0] != '':
                     action.send(user_instance, verb='Tagged',action_object=b,description='Tagged File  '+str(b.file_name)+' on '+','.join(codes) , target=content_type)
-                if not description == '' and not date_created == '':   
+                if not description == '' and not date_created == '' and len(your_ids) > 0:    
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description and date.' , target=content_type)
-                elif not description == '':    
+                elif not description == '' and len(your_ids) > 0:     
                     #print('i am here')    
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description.' , target=content_type)
-                elif not date_created == '':     
+                elif not date_created == '' and len(your_ids) > 0:      
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s date.' , target=content_type)
-            print (your_ids)
-            File.objects.filter(id__in=your_ids).update(**d)
-           
-        return JsonResponse({'is_updated': is_updated})
+
+            TaggedWhatever.objects.bulk_create(bulk_taggedFile)
+
+            print ('file id',your_ids)
+
+            if len(your_ids) == 0 and len(tags) == 0:
+                return JsonResponse({'is_updated': 0})
+            if current_user.is_superuser or current_user.is_staff:
+                File.objects.filter(id__in=your_ids).update(**d)
+                return JsonResponse({'is_updated': 1})
+
     else:
         return HttpResponse(status=500)
 
@@ -205,7 +222,6 @@ def bulkDelete(request):
 
     if request.user.is_authenticated and user_instance.has_perm('accreapp.delete_file'):
         controlNums = json.loads(request.POST['controlNums'])
-        is_deleted = 1
         counter = 0
         if len(controlNums) > 0 :
             for i in controlNums:
@@ -215,9 +231,9 @@ def bulkDelete(request):
                 print (str(counter))
                 action.send(user_instance, verb='Deleted',action_object=b,description='Deleted File  '+str(b.file_name) , target=content_type)
             if counter == len(controlNums):
-                print ('wwwww')
+                #print ('wwwww')
                 File.objects.filter(id__in=controlNums).update(flag=1)
-            return JsonResponse({'is_deleted_items': is_deleted})
+            return JsonResponse({'is_deleted_items': 1})
         else:
             return JsonResponse({'is_deleted_items': 0})
     else:
@@ -232,10 +248,12 @@ def removeTag(request):
         tag = request.POST.get('tag')
         file = request.POST.get('file_name')
         b = File.objects.get(file_name=file)
-        TaggedWhatever.objects.filter(tag__code=tag,object_id=b.id).delete()
-        action.send(user_instance, verb='Removed tag',action_object=b,description='Removed tag  '+tag+' on '+str(b.file_name) , target=content_type)
-
-        return JsonResponse({'is_deleted_items': 1})
+        if TaggedWhatever.objects.filter(tag__code=tag,object_id=b.id,user=current_user.id) or current_user.is_superuser:
+            TaggedWhatever.objects.filter(tag__code=tag,object_id=b.id).delete()
+            action.send(user_instance, verb='Removed tag',action_object=b,description='Removed tag  '+tag+' on '+str(b.file_name) , target=content_type)
+            return JsonResponse({'is_tag_removed': 1})
+        else:
+            return JsonResponse({'is_tag_removed': 0})
     else:
         return HttpResponse(status=500)
 
@@ -260,20 +278,23 @@ def mergePDFs(request):
         #doc_pdf = fitz.open()
         if get_tag and len(list_files) > 0:
             for i in list_files:
-                f = File.objects.get(id=i)
-                f_file_name =  str(f.file_name)
-                #infile = fitz.open(default_storage.path(f_file_name))
-                f_tags = f.tags.all()
-                list_f_tags = f.tags.all()
-                f_ttags = []
-                for t in list_f_tags:
-                    f_ttags.append('Area '+t.code+'('+t.description+')')
-                #print (f_ttags)
-                file_json.append({
-                    'file_name':f_file_name,
-                    'tags': list(f_ttags)
-                    }
-                )
+                if File.objects.filter(Q(id=i),Q(flag=0)).exists():
+                    f = File.objects.get(id=i)
+                    f_file_name =  str(f.file_name)
+                    #infile = fitz.open(default_storage.path(f_file_name))
+                    f_tags = f.tags.all()
+                    list_f_tags = f.tags.all()
+                    f_ttags = []
+                    for t in list_f_tags:
+                        f_ttags.append('Area '+t.code+'('+t.description+')')
+                    #print (f_ttags)
+                    file_json.append({
+                        'file_name':f_file_name,
+                        'tags': list(f_ttags)
+                        }
+                    )
+                else:
+                    print ('deleted',i)
                 #doc_pdf.insertPDF(infile)
                 #infile.close()
             #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)
