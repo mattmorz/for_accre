@@ -30,7 +30,8 @@ def home(request):
     current_user = request.user
     user_instance = User.objects.get(id=current_user.id)
     nodes = Category.objects.all().annotate(count=Count('children')).order_by('tree_id')
-    return render(request, 'accreapp/home.html', {'nodes': nodes })
+    isAllowed = current_user.is_superuser | current_user.is_staff
+    return render(request, 'accreapp/home.html', {'nodes': nodes, 'isAllowed':isAllowed})
 
 def index(request):
     username = request.POST.get('username',False)
@@ -192,7 +193,8 @@ def bulkUpdate(request):
                 elif not date_created == '':     
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s date.' , target=content_type)
             print (your_ids)
-            File.objects.filter(id__in=your_ids).update(**d)
+            if current_user.is_superuser or current_user.is_staff:
+                File.objects.filter(id__in=your_ids).update(**d)
            
         return JsonResponse({'is_updated': is_updated})
     else:
@@ -260,20 +262,23 @@ def mergePDFs(request):
         #doc_pdf = fitz.open()
         if get_tag and len(list_files) > 0:
             for i in list_files:
-                f = File.objects.get(id=i)
-                f_file_name =  str(f.file_name)
-                #infile = fitz.open(default_storage.path(f_file_name))
-                f_tags = f.tags.all()
-                list_f_tags = f.tags.all()
-                f_ttags = []
-                for t in list_f_tags:
-                    f_ttags.append('Area '+t.code+'('+t.description+')')
-                #print (f_ttags)
-                file_json.append({
-                    'file_name':f_file_name,
-                    'tags': list(f_ttags)
-                    }
-                )
+                if File.objects.filter(Q(id=i),Q(flag=0)).exists():
+                    f = File.objects.get(id=i)
+                    f_file_name =  str(f.file_name)
+                    #infile = fitz.open(default_storage.path(f_file_name))
+                    f_tags = f.tags.all()
+                    list_f_tags = f.tags.all()
+                    f_ttags = []
+                    for t in list_f_tags:
+                        f_ttags.append('Area '+t.code+'('+t.description+')')
+                    #print (f_ttags)
+                    file_json.append({
+                        'file_name':f_file_name,
+                        'tags': list(f_ttags)
+                        }
+                    )
+                else:
+                    pass
                 #doc_pdf.insertPDF(infile)
                 #infile.close()
             #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)

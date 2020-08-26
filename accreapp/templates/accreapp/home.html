@@ -99,6 +99,7 @@
        
         <div class="btn-toolbar mb-2 mb-md-0">
            {% if request.user.is_staff or request.user.is_superuser %}
+           <input type="hidden" value="True" id="isAllowed">
           <div class="btn-group mr-2">
             <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target=".bulk-update" id="btnBulkUpdate" disabled> <span data-feather="tag"></span> Update/Tag</button>
             <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target=".bulk-delete" id="btnBulkDelete" disabled> <span data-feather="trash-2"></span>Delete</button>
@@ -111,7 +112,8 @@
             <button type="button" class="btn btn-sm btn-info" title="View PDF of the Files" id="viewPDF" data-toggle="modal" data-target="#staticBackdrop"> <span data-feather="eye"></span> View PDFs</button>
           </div>
         </div>
-        
+         
+      <input type="hidden" value="{{ isAllowed }}" id="isAllowed">
       </div>
       
       

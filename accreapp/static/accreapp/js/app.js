@@ -37,7 +37,8 @@ var table2 = $('#myTable').DataTable({
                         '<input type="checkbox" class="form-check-input updateMe" onclick="updateMeF(this,'+file_id+');" name="checkboxname">'+
                         '</div>';
               }
-          }
+          },
+          'visible': $('#isAllowed').val() === 'True' ? true : false
       },
       {
         'targets': 1,
@@ -45,7 +46,8 @@ var table2 = $('#myTable').DataTable({
             var file_name = row.file_name;
             var lnk = "/media/"+file_name+"";
             return  '<a href="'+lnk+'" title="'+file_name+'" target="_blank">'+file_name.substring(0,20)+"...</>";
-        }
+        },
+
       },
       {
         'targets': 3,
@@ -61,6 +63,9 @@ var table2 = $('#myTable').DataTable({
             var tags = row.tagged_items__tag__code;
             return  tags;
         }
+      },{
+        'targets': 5,
+        'visible': $('#isAllowed').val() === 'True' ? true : false
       },
       {
         'targets':[6,7],
