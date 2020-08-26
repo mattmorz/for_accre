@@ -166,26 +166,32 @@ def bulkUpdate(request):
                 d['description'] = description
             if not date_created == '':
                 d['date_created'] = date_created
+            
             bulk_taggedFile = []
             for i in controlNums:
                 b = File.objects.get(id=i)
                 if b.user.id == current_user.id:
                     your_ids.append(i)
                 codes = []
+               
+                print ('tags',tags)
                 for j in tags:
                     if len(tags) > 0 and tags[0] != '':
                         tagss =  Category.objects.get(id = j)
+                        '''
                         if Category.objects.filter(id=j).exists() and b.user.id == current_user.id:
                             #TaggedWhatever.objects.filter(object_id=i).delete()
                             bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss, user = user_instance))
                             TaggedWhatever.objects.bulk_create(bulk_taggedFile)
                             codes.append(tagss.code)      
-                        elif Category.objects.filter(id=j).exists():
+                        '''
+                        if Category.objects.filter(id=j).exists() and not TaggedWhatever.objects.filter(object_id=i,tag = tagss).exists():
                             bulk_taggedFile.append(TaggedWhatever(object_id = i,content_type = content_type,tag = tagss, user = user_instance))
-                            TaggedWhatever.objects.bulk_create(bulk_taggedFile)
+                            #print (bulk_taggedFile)
                             codes.append(tagss.code) 
                         else:
-                            print ('invalid tag')
+                            print ('duplicated/invalid tag')
+
                 if len(tags) > 0 and tags[0] != '':
                     action.send(user_instance, verb='Tagged',action_object=b,description='Tagged File  '+str(b.file_name)+' on '+','.join(codes) , target=content_type)
                 if not description == '' and not date_created == '' and len(your_ids) > 0:    
@@ -195,7 +201,10 @@ def bulkUpdate(request):
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s description.' , target=content_type)
                 elif not date_created == '' and len(your_ids) > 0:      
                     action.send(user_instance, verb='Updated',action_object=b,description='Updated File  '+str(b.file_name)+'\'s date.' , target=content_type)
-            print (your_ids)
+
+            TaggedWhatever.objects.bulk_create(bulk_taggedFile)
+
+            print ('file id',your_ids)
 
             if len(your_ids) == 0 and len(tags) == 0:
                 return JsonResponse({'is_updated': 0})
