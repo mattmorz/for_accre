@@ -299,8 +299,15 @@ $('#frmBulkUpdate').submit(function(e){
         },
         success : function(response) {
           $('#sPin').hide();
-          console.log(response.is_updated);
-          table2.ajax.reload();
+          if (response.is_updated === 1){
+            table2.ajax.reload();
+          }else if (response.is_updated === 2){
+            alert('Nothing to update! If this is not your file, tagging is only allowed.')
+          }
+          else{
+            alert('You are not allowed to update description and document date of a file that is not uploaded by you!')
+          }
+          
         },
         error: function(e){
             $('#sPin').hide();
@@ -335,7 +342,7 @@ $('#frmBulkdelete').submit(function(e){
           },
           error: function(e){
               $('#sPin1').hide();
-              if(e.status === 404){
+              if(e.status === 500){
                 alert('You are not allowed to delete file.');
               }
              
@@ -363,15 +370,20 @@ $('#frmRemoveTag').submit(function(e){
               $('#sPin1').show(); 
           },
           success : function(response) {
-              $('#sPin1').hide();
+            $('#sPin1').hide();
+            if(response.is_tag_removed){
               table2.ajax.reload();
               $('#toBeRemoveTags').html('');
               $('#tag').html('')
+            }else{
+              alert('You cannot remove tag that is not tagged by you!');
+            }
+            
           },
           error: function(e){
               $('#sPin1').hide();
-              if(e.status === 404){
-                alert('You are not allowed to delete file.');
+              if(e.status === 500){
+                alert('Error, something wrong happened!');
               }
              
           }
