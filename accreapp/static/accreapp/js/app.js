@@ -446,6 +446,49 @@ $(document).ready(function(){
     table2.search($(this).val()).draw() ;
   })
 
+  $('#viewPDF').click(function(){
+    $('#myPDF').html(' ');
+  })
+
+
+  $('#staticBackdrop').on('shown.bs.modal', function (e) {
+    //filenames = [];
+    $.ajax({
+        type : 'GET',
+        data: {
+          'tag': table2.search()
+        },
+        dataType:'json',
+        url : '/generate_pdf',
+        beforeSend: function(){
+            $('#sPin2').show(); 
+        },
+        success : function(response) {
+            $('#sPin2').hide();
+            $('#staticBackdropLabel').text(response.tag)
+            var files = response.files;
+            var files_length = files.length;
+            for(var i=0; i<files_length; i++){
+              var tags = files[i].tags.toString();
+              $('#myPDF').append('<h6>'+files[i].file_name+'</h6><p>Tags: '+tags+'<embed src="/media/'+files[i].file_name+'" frameborder="0" width="100%" height="500px"></embed>');
+            }
+            
+        },
+        error: function(e){
+            $('#sPin2').hide();
+            if(e.status === 500){
+              $('#staticBackdropLabel').text('Oooops!')
+               $('#myPDF').html('<h4 class="text-danger"> Error, no file for this tag.</h4>');
+            }
+           
+        }
+    }); 
+  })
+
+
+  $('#staticBackdrop').on('hidden.bs.modal', function (e) {
+      $('#staticBackdropLabel').text(' ');
+  })
 
 })
 

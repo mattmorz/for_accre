@@ -24,16 +24,13 @@
     background-color: beige;
 }
 
-#sPin,#sPin1{
+#sPin,#sPin1,#sPin2{
     position: absolute;
     top: 50%;
     display: none;
     left: 45%;
  }
 
- #toBeUpdatedFiles{
-    
- }
 
  .tagtag{
      cursor: pointer;

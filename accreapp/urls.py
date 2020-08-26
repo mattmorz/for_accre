@@ -11,4 +11,5 @@ urlpatterns = [
     path('bulk_update', views.bulkUpdate, name='bulk_update'),
     path('bulk_delete', views.bulkDelete, name='bulk_delete'),
     path('remove_tag', views.removeTag, name='remove_tag'),
+    path('generate_pdf', views.mergePDFs, name='generate_pdf'),
 ]
