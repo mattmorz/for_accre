@@ -10,10 +10,12 @@ from django.http import HttpResponse
 from django.template import loader
 from django.core.files.storage import default_storage
 from django.db.models import Q
+from django.conf import settings
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
+from django.utils.crypto import get_random_string
 
 from accreapp.models import TaggedWhatever, Profile, File, Category
 from taggit.models import Tag
@@ -21,6 +23,7 @@ from actstream import action
 
 import os, json
 from model_utils import Choices
+import fitz
 
 @login_required
 def home(request):
@@ -66,9 +69,9 @@ def callUpload(request):
         else:
             #print 'Already saved on the server -->'+fileN
             #return JsonResponse({'is_uploaded':0})
-            raise Http404
+            return HttpResponse(status=500)
     else:
-        raise Http404
+        return HttpResponse(status=500)
 
 ORDER_COLUMN_CHOICES =Choices(
     ('1', 'file_name'),
@@ -138,7 +141,7 @@ def mainTableData(request):
 
         return JsonResponse(result, safe=False)
     else:
-        raise Http404
+        return HttpResponse(status=500)
 
 def bulkUpdate(request):
     if request.user.is_authenticated and request.method == 'POST':
@@ -193,7 +196,7 @@ def bulkUpdate(request):
            
         return JsonResponse({'is_updated': is_updated})
     else:
-        raise Http404
+        return HttpResponse(status=500)
 
 def bulkDelete(request):
     current_user = request.user
@@ -218,7 +221,7 @@ def bulkDelete(request):
         else:
             return JsonResponse({'is_deleted_items': 0})
     else:
-        raise Http404
+        return HttpResponse(status=500)
 
 def removeTag(request):
     current_user = request.user
@@ -234,4 +237,48 @@ def removeTag(request):
 
         return JsonResponse({'is_deleted_items': 1})
     else:
-        raise Http404
+        return HttpResponse(status=500)
+
+def mergePDFs(request):
+    if request.user.is_authenticated:
+        #pdf_files = request.GET.getlist('file_names[]')
+        tag = request.GET.get('tag')
+        
+        get_tag = Category.objects.get(code = tag)
+        child_tags = get_tag.get_descendants(include_self=True)
+        list_child_tags = list(child_tags.values_list('id', flat=True))
+        #print (list_child_tags)
+        unique_id = get_random_string(length=8).upper()
+        pdfFileName = str(get_tag.code)+'_'+unique_id+'.pdf'
+
+        #print ('tag',tag)
+        list_files = list(TaggedWhatever.objects.filter(tag_id__in=list_child_tags).values_list('object_id',flat=True).distinct())
+        #print ('files',list_files)
+        #print (pdfFileName)
+
+        file_json = []
+        #doc_pdf = fitz.open()
+        if get_tag and len(list_files) > 0:
+            for i in list_files:
+                f = File.objects.get(id=i)
+                f_file_name =  str(f.file_name)
+                #infile = fitz.open(default_storage.path(f_file_name))
+                f_tags = f.tags.all()
+                list_f_tags = f.tags.all()
+                f_ttags = []
+                for t in list_f_tags:
+                    f_ttags.append('Area '+t.code+'('+t.description+')')
+                #print (f_ttags)
+                file_json.append({
+                    'file_name':f_file_name,
+                    'tags': list(f_ttags)
+                    }
+                )
+                #doc_pdf.insertPDF(infile)
+                #infile.close()
+            #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)
+            return JsonResponse({'is_generated': 1,'generated_pdf':pdfFileName, 'files':file_json,'tag': 'Area '+get_tag.code+': '+get_tag.description})
+        else:
+            return HttpResponse(status=500)
+    else:
+        return HttpResponse(status=500)
