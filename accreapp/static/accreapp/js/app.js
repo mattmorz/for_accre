@@ -302,10 +302,10 @@ $('#frmBulkUpdate').submit(function(e){
           if (response.is_updated === 1){
             table2.ajax.reload();
           }else if (response.is_updated === 2){
-            alert('Nothing to update! If this is not your file, tagging is only allowed.')
+            alert('Nothing to update! If this is not your file, only tagging is allowed.')
           }
           else{
-            alert('You are not allowed to update description and document date of a file that is not uploaded by you!')
+            alert('If you are not the uploader of the file, you are not allowed to update the description and document date!')
           }
           
         },
