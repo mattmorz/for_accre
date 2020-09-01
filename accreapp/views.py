@@ -303,7 +303,7 @@ def mergePDFs(request):
                 #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)
                 return JsonResponse({'is_generated': 1,'generated_pdf':pdfFileName, 'files':file_json,'tag': 'Area '+get_tag.code+': '+get_tag.description})
             else:
-                return HttpResponse(status=500)
+                return JsonResponse({'is_generated': 0})
         except Category.DoesNotExist:
             return JsonResponse({'is_generated': 0})
     else:

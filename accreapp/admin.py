@@ -11,6 +11,9 @@ class FileAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('code','description','parent','slug')
     list_filter = ('code','parent')
+    search_fields = (
+        'code',
+    )
 
 admin.site.register(Category,CategoryAdmin)
 admin.site.register(TaggedWhatever)

@@ -73,13 +73,13 @@
         <ul class="root">
           {% recursetree nodes %}
               <li class="nav-item">
-                  {% if node.level == 0 %}
+                  {% if node.is_root_node %}
                     <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand" class="forFilter" data-tag="{{ node.name }}">{{ node.name }} {{ node.description }}</a>
                   {% elif node.level == 1 %}
                     <a href="#collapse{{ node.pk }}" data-toggle="collapse" title="Click to expand" class="forFilter" data-tag="{{ node.name }}">{{ node.name }} {{ node.description }}</a>  <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
                   {% else %}
                     {% if node.is_leaf_node %}
-                      <a href="?q={{ node.slug }}" title="{{ node.description }}" data-toggle="collapse" class="forFilter" data-tag="{{ node.name }}">{{ node.name }}  </a>
+                      <a href="#collapse{{ node.pk }}" title="{{ node.description }}" data-toggle="collapse" class="forFilter" data-tag="{{ node.name }}">{{ node.name }}  </a>
                     {% else %}
                       <a href="#collapse{{ node.pk }}" title="{{ node.description }}" data-toggle="collapse" class="forFilter" data-tag="{{ node.name }}">{{ node.name }}  </a> <small>({{ node.count }} more section{{ node.count|pluralize:" ,s" }})</small>
                     {% endif %}

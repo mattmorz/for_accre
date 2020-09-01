@@ -428,7 +428,7 @@ function updateMeF(that,controlNum){
   }
 
 }
-
+var MY_TAG = null;
 $(document).ready(function(){
   $('#btnBulkUpdate').attr("disabled", true);
   $('#btnBulkDelete').attr("disabled", true);
@@ -467,13 +467,13 @@ $(document).ready(function(){
     $('#myPDF').html(' ');
   })
 
-
+ 
   $('#staticBackdrop').on('shown.bs.modal', function (e) {
     //filenames = [];
     $.ajax({
         type : 'GET',
         data: {
-          'tag': table2.search()
+          'tag': MY_TAG
         },
         dataType:'json',
         url : '/generate_pdf',
@@ -495,6 +495,7 @@ $(document).ready(function(){
             }else{
               $('#myPDF').html('<h4 class="text-danger"> Error, no file/document found. You may select AREA on the sidebar.</h4>');
             }
+            MY_TAG = null;
         },
         error: function(e){
             $('#sPin2').hide();
@@ -516,6 +517,8 @@ $(document).ready(function(){
 
 $(document).on('click', '.forFilter', function () {
   var tag = $(this).attr('data-tag');
+  MY_TAG = tag;
+  console.log(MY_TAG)
   table2.search(tag.trim()).draw() ;
 
 })
