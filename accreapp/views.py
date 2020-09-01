@@ -111,6 +111,7 @@ def mainTableData(request):
         if search_value:
             allfiles = allfiles.filter(Q(file_name__icontains=search_value) |
                                     Q(tags__code__istartswith=search_value) |
+                                    Q(tags__description__icontains=search_value) |
                                     Q(user__username__icontains=search_value) |
                                     Q(description__icontains=search_value)).all().exclude(flag=1).distinct()
         count = allfiles.count()
