@@ -262,44 +262,49 @@ def mergePDFs(request):
         #pdf_files = request.GET.getlist('file_names[]')
         tag = request.GET.get('tag')
         
-        get_tag = Category.objects.get(code = tag)
-        child_tags = get_tag.get_descendants(include_self=True)
-        list_child_tags = list(child_tags.values_list('id', flat=True))
-        #print (list_child_tags)
-        unique_id = get_random_string(length=8).upper()
-        pdfFileName = str(get_tag.code)+'_'+unique_id+'.pdf'
+        try: 
+            get_tag = Category.objects.get(code = tag)
+            child_tags = get_tag.get_descendants(include_self=True)
+            list_child_tags = list(child_tags.values_list('id', flat=True))
+            #print (list_child_tags)
+            unique_id = get_random_string(length=8).upper()
+            pdfFileName = str(get_tag.code)+'_'+unique_id+'.pdf'
 
-        #print ('tag',tag)
-        list_files = list(TaggedWhatever.objects.filter(tag_id__in=list_child_tags).values_list('object_id',flat=True).distinct())
-        #print ('files',list_files)
-        #print (pdfFileName)
+            #print ('tag',tag)
+            list_files = list(TaggedWhatever.objects.filter(tag_id__in=list_child_tags).values_list('object_id',flat=True).distinct())
+            #print ('files',list_files)
+            #print (pdfFileName)
 
-        file_json = []
-        #doc_pdf = fitz.open()
-        if get_tag and len(list_files) > 0:
-            for i in list_files:
-                if File.objects.filter(Q(id=i),Q(flag=0)).exists():
-                    f = File.objects.get(id=i)
-                    f_file_name =  str(f.file_name)
-                    #infile = fitz.open(default_storage.path(f_file_name))
-                    f_tags = f.tags.all()
-                    list_f_tags = f.tags.all()
-                    f_ttags = []
-                    for t in list_f_tags:
-                        f_ttags.append('Area '+t.code+'('+t.description+')')
-                    #print (f_ttags)
-                    file_json.append({
-                        'file_name':f_file_name,
-                        'tags': list(f_ttags)
-                        }
-                    )
-                else:
-                    print ('deleted',i)
-                #doc_pdf.insertPDF(infile)
-                #infile.close()
-            #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)
-            return JsonResponse({'is_generated': 1,'generated_pdf':pdfFileName, 'files':file_json,'tag': 'Area '+get_tag.code+': '+get_tag.description})
-        else:
-            return HttpResponse(status=500)
+            file_json = []
+            #doc_pdf = fitz.open()
+            if not get_tag:
+                return JsonResponse({'is_generated': 0})
+            if get_tag and len(list_files) > 0:
+                for i in list_files:
+                    if File.objects.filter(Q(id=i),Q(flag=0)).exists():
+                        f = File.objects.get(id=i)
+                        f_file_name =  str(f.file_name)
+                        #infile = fitz.open(default_storage.path(f_file_name))
+                        f_tags = f.tags.all()
+                        list_f_tags = f.tags.all()
+                        f_ttags = []
+                        for t in list_f_tags:
+                            f_ttags.append('Area '+t.code+'('+t.description+')')
+                        #print (f_ttags)
+                        file_json.append({
+                            'file_name':f_file_name,
+                            'tags': list(f_ttags)
+                            }
+                        )
+                    else:
+                        print ('deleted',i)
+                    #doc_pdf.insertPDF(infile)
+                    #infile.close()
+                #doc_pdf.save(settings.MEDIA_ROOT+'/'+pdfFileName, deflate=True, garbage=3)
+                return JsonResponse({'is_generated': 1,'generated_pdf':pdfFileName, 'files':file_json,'tag': 'Area '+get_tag.code+': '+get_tag.description})
+            else:
+                return HttpResponse(status=500)
+        except Category.DoesNotExist:
+            return JsonResponse({'is_generated': 0})
     else:
         return HttpResponse(status=500)
