@@ -302,7 +302,7 @@ $('#frmBulkUpdate').submit(function(e){
           if (response.is_updated === 1){
             table2.ajax.reload();
           }else if (response.is_updated === 2){
-            alert('Nothing to update! If this is not your file, only tagging is allowed.')
+            alert('Nothing to update! If this is not your file, you are only allowed to add tags.')
           }
           else{
             alert('If you are not the uploader of the file, you are not allowed to update the description and document date!')
@@ -376,7 +376,7 @@ $('#frmRemoveTag').submit(function(e){
               $('#toBeRemoveTags').html('');
               $('#tag').html('')
             }else{
-              alert('You cannot remove tag that is not tagged by you!');
+              alert('You cannot remove tag that is not added by you!');
             }
             
           },
@@ -481,21 +481,26 @@ $(document).ready(function(){
             $('#sPin2').show(); 
         },
         success : function(response) {
+
             $('#sPin2').hide();
-            $('#staticBackdropLabel').text(response.tag)
-            var files = response.files;
-            var files_length = files.length;
-            for(var i=0; i<files_length; i++){
-              var tags = files[i].tags.toString();
-              $('#myPDF').append('<h6>'+files[i].file_name+'</h6><p>Tags: '+tags+'<embed src="/media/'+files[i].file_name+'" frameborder="0" width="100%" height="500px"></embed>');
+           
+            if(response.is_generated){
+              $('#staticBackdropLabel').text(response.tag)
+              var files = response.files;
+              var files_length = files.length;
+              for(var i=0; i<files_length; i++){
+                var tags = files[i].tags.toString();
+                $('#myPDF').append('<h6>'+files[i].file_name+'</h6><p>Tags: '+tags+'<embed src="/media/'+files[i].file_name+'" frameborder="0" width="100%" height="500px"></embed>');
+              }
+            }else{
+              $('#myPDF').html('<h4 class="text-danger"> Error, no file/document found. You may select AREA on the sidebar.</h4>');
             }
-            
         },
         error: function(e){
             $('#sPin2').hide();
             if(e.status === 500){
-              $('#staticBackdropLabel').text('Oooops!')
-               $('#myPDF').html('<h4 class="text-danger"> Error, no file for this tag.</h4>');
+              //$('#staticBackdropLabel').text('Oooops!')
+              $('#myPDF').html('<h4 class="text-danger"> Error, something went wrong!</h4>');
             }
            
         }
