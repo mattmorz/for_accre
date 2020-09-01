@@ -305,7 +305,7 @@ $('#frmBulkUpdate').submit(function(e){
             alert('Nothing to update! If this is not your file, you are only allowed to add tags.')
           }
           else{
-            alert('You are not allowed to update description and document date of a file that is not uploaded by you!')
+            alert('If you are not the uploader of the file, you are not allowed to update the description and document date!')
           }
           
         },
