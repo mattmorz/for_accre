@@ -318,6 +318,8 @@
 </div>
 
 
+
+
 <!-- Modal ViewPDF-->
 <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -336,6 +338,24 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODAL NDA-->
+ <div class="modal nda" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel1" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel1">Non-Disclosure Agreement</h5>
+      </div>
+      <div class="modal-body" >
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="id_verify_nda" name="id_verify_nda" requied />
+            <label class="form-check-label" for="id_verify_nda">By checking, I agree to the statement depicted above.</label>
+          </div>
+          <button type="submit" class="btn btn-info float-right" id="continue">Continue</button>
       </div>
     </div>
   </div>

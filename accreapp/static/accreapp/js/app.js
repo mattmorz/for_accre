@@ -430,6 +430,19 @@ function updateMeF(that,controlNum){
 }
 var MY_TAG = null;
 $(document).ready(function(){
+
+ $('.nda').modal('show');
+
+  $('#continue').click(function(){
+    if( $('#id_verify_nda').is(':checked'))
+    {
+      $('.nda').modal('hide');
+    }else{
+      alert('You need to agree with the statement depicted on Non Disclosure Agreement.')
+    }
+  })
+
+
   $('#btnBulkUpdate').attr("disabled", true);
   $('#btnBulkDelete').attr("disabled", true);
   $('#btnBulkUpdate').click(function(){
@@ -490,7 +503,7 @@ $(document).ready(function(){
               var files_length = files.length;
               for(var i=0; i<files_length; i++){
                 var tags = files[i].tags.toString();
-                $('#myPDF').append('<h6>'+files[i].file_name+'</h6><p>Tags: '+tags+'<embed src="/media/'+files[i].file_name+'" frameborder="0" width="100%" height="500px"></embed>');
+                $('#myPDF').append('<h6>'+files[i].file_name+'</h6><p>Tags: '+tags+'<iframe src="http://127.0.0.1/ViewerJS/#../../http://127.0.0.1:8000/media/'+files[i].file_name+'" frameborder="0" width="100%" height="500px"></iframe>');
               }
             }else{
               $('#myPDF').html('<h4 class="text-danger"> Error, no file/document found. You may select AREA on the sidebar.</h4>');
