@@ -6,7 +6,7 @@
 -- Generation Time: Sep 05, 2020 at 11:53 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.1
-
+SET FOREIGN_KEY_CHECKS=0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
